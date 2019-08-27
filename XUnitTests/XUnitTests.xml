@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>XUnitTests</name>
+    </assembly>
+    <members>
+        <member name="M:XUnitTests.CalculatorTests.Addition">
+            <summary>
+            Given the number 5
+            And the number 3
+            When I add the numbers together
+            Then the answer is 8
+            </summary>
+        </member>
+    </members>
+</doc>

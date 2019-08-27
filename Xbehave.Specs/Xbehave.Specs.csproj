@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <PackageId>RG.Xbehave.Specs</PackageId>
+    <Authors>Ronny Gunawan</Authors>
+    <Product>RG.Xbehave.Specs</Product>
+    <Description>An extension to Xbehave that allows you to write gherkin-style unit tests.</Description>
+    <Copyright>(c) 2019 Ronny Gunawan</Copyright>
+    <PackageProjectUrl>https://github.com/ronnygunawan/xbehave-specs</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ronnygunawan/xbehave-specs</RepositoryUrl>
+    <PackageTags>cucumber xbehave xunit</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ApplicationIcon />
+    <OutputType>Library</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="Xbehave" Version="2.4.0" />
+  </ItemGroup>
+
+</Project>
