@@ -57,3 +57,7 @@ protected void ThenTheAnswerIs(int ans) {
 ```
 
 [See full example](https://github.com/ronnygunawan/xbehave-specs/blob/master/XUnitTests/CalculatorTests.cs)
+
+## 5. Run Tests
+
+![Screenshot](https://github.com/ronnygunawan/xbehave-specs/raw/master/xbehave.png "Test Explorer")
