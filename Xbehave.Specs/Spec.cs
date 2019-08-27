@@ -16,39 +16,39 @@ namespace Xbehave.Specs {
 		private const string THEN = "Then";
 
 		public static void IsInXmlComments(object testContext) {
-			//StackTrace stackTrace = new StackTrace();
-			//MethodBase? scenarioMethod = stackTrace.GetFrames()
-			//	.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
-			//	?.GetMethod();
-			//if (scenarioMethod == null) {
-			//	throw new MissingScenarioDefinitionException();
-			//}
-			//string? scenarioDefinition = scenarioMethod.GetSummary();
-			//if (scenarioDefinition == null) {
-			//	throw new MissingScenarioDefinitionException(scenarioMethod);
-			//}
+			StackTrace stackTrace = new StackTrace();
+			MethodBase? scenarioMethod = stackTrace.GetFrames()
+				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
+				?.GetMethod();
+			if (scenarioMethod == null) {
+				throw new MissingScenarioDefinitionException();
+			}
+			string? scenarioDefinition = scenarioMethod.GetSummary();
+			if (scenarioDefinition == null) {
+				throw new MissingScenarioDefinitionException(scenarioMethod);
+			}
 
-			//RunSteps(
-			//	testContext: testContext,
-			//	scenarioDefinition: string.Join(Environment.NewLine, scenarioDefinition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim())),
-			//	stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
-			//);
+			RunSteps(
+				testContext: testContext,
+				scenarioDefinition: string.Join(Environment.NewLine, scenarioDefinition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim())),
+				stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
+			);
 		}
 
 		public static void Is(object testContext, string scenarioDefinition) {
-			//StackTrace stackTrace = new StackTrace();
-			//MethodBase? scenarioMethod = stackTrace.GetFrames()
-			//	.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
-			//	?.GetMethod();
-			//if (scenarioMethod == null) {
-			//	throw new MissingScenarioDefinitionException();
-			//}
+			StackTrace stackTrace = new StackTrace();
+			MethodBase? scenarioMethod = stackTrace.GetFrames()
+				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
+				?.GetMethod();
+			if (scenarioMethod == null) {
+				throw new MissingScenarioDefinitionException();
+			}
 
-			//RunSteps(
-			//	testContext: testContext,
-			//	scenarioDefinition: string.Join(Environment.NewLine, scenarioDefinition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim())),
-			//	stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
-			//);
+			RunSteps(
+				testContext: testContext,
+				scenarioDefinition: string.Join(Environment.NewLine, scenarioDefinition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim())),
+				stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
+			);
 		}
 
 		private static ImmutableList<(string conjunction, string regex, MethodInfo method)> GetOrCollectStepDefinitions(MethodBase scenarioMethod) {
@@ -135,11 +135,11 @@ namespace Xbehave.Specs {
 						throw new NotImplementedException($"Step parameter of type {parameters[i].ParameterType.Name} is not supported yet. Supported types are int, double, decimal, and string.");
 					}
 				}
-				//if (matchingMethod.ReturnType == typeof(Task)) {
-				//	step.x(() => (Task)matchingMethod.Invoke(testContext, parameterValues)!);
-				//} else {
-				//	step.x(() => { matchingMethod.Invoke(testContext, parameterValues); });
-				//}
+				if (matchingMethod.ReturnType == typeof(Task)) {
+					step.x(() => (Task)matchingMethod.Invoke(testContext, parameterValues)!);
+				} else {
+					step.x(() => { matchingMethod.Invoke(testContext, parameterValues); });
+				}
 			}
 		}
 	}
