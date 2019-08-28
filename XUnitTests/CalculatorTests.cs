@@ -24,23 +24,12 @@ namespace XUnitTests {
 		}
 
 		[Scenario]
-		public void Addition1() {
-			Spec.IsInMarkdownDocument(this, "Calculator.md", "Addition 1");
-		}
-
-		[Scenario]
-		public void Addition2() {
-			Spec.IsInMarkdownDocument(this, "Calculator.md", "Addition 2");
-		}
-
-		[Scenario]
-		public void Addition3() {
-			Spec.IsInMarkdownDocument(this, "Calculator.md", "Addition 3");
-		}
-
-		[Scenario]
-		public void Addition4() {
-			Spec.IsInMarkdownDocument(this, "Calculator.md", "Addition 4");
+		[Example("Addition 1")]
+		[Example("Addition 2")]
+		[Example("Addition 3")]
+		[Example("Addition 4")]
+		public void ScenarioInMarkdown(string scenarioName) {
+			Spec.IsInMarkdownDocument(this, "Calculator.md", scenarioName);
 		}
 
 		[Given("the number {x}")]
