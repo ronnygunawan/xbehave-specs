@@ -18,8 +18,9 @@ In your .csproj file add:
 </PropertyGroup>
 ```
 
-## 3. Write Your Scenario in XML Comment
+## 3. Write Your Scenario
 
+In XML comments:
 ```csharp
 using Xbehave;
 using Xbehave.Specs;
@@ -34,6 +35,21 @@ using Xunit;
 [Scenario]
 public void Addition() {
     Spec.IsInXmlComments(this);
+}
+```
+
+Or in markdown documents:
+
+> # Addition
+> Given the number 5  
+> And the number 3  
+> When I add the numbers together  
+> Then the answer is 8
+
+```csharp
+[Scenario]
+public void Addition() {
+    Spec.IsInMarkdownDocument(this, "Calculator.md", "Addition");
 }
 ```
 
