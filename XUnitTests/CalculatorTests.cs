@@ -1,15 +1,14 @@
 using FluentAssertions;
 using Xbehave;
 using Xbehave.Specs;
-using Xunit;
 using XUnitTests.Models;
 
 namespace XUnitTests {
-	public class CalculatorTests : IClassFixture<Calculator> {
+	public class CalculatorTests {
 		private readonly Calculator _calculator;
 
-		public CalculatorTests(Calculator calculator) {
-			_calculator = calculator;
+		public CalculatorTests() {
+			_calculator = new Calculator();
 		}
 
 		/// <summary>
