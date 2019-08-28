@@ -48,7 +48,7 @@ namespace Xbehave.Specs {
 			string fileContent = _markdownDocumentDictionary.GetOrAdd(fileName, fileName => {
 				try {
 					return File.ReadAllText(fileName);
-				} catch (FileNotFoundException) {
+				} catch (Exception exc) when (exc is FileNotFoundException || exc is DirectoryNotFoundException) {
 					return File.ReadAllText($@"..\..\..\{fileName}");
 				}
 			});
