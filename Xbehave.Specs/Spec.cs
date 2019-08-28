@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 namespace Xbehave.Specs {
 	public static class Spec {
 		private static readonly ConcurrentDictionary<Type, ImmutableList<(string conjunction, string regex, MethodInfo method)>> _stepDefinitionDictionary = new ConcurrentDictionary<Type, ImmutableList<(string conjunction, string regex, MethodInfo method)>>();
+		private static readonly ConcurrentDictionary<string, string> _markdownDocumentDictionary = new ConcurrentDictionary<string, string>();
 		private const string GIVEN = "Given";
 		private const string AND = "And";
 		private const string WHEN = "When";
@@ -31,6 +33,47 @@ namespace Xbehave.Specs {
 			RunSteps(
 				testContext: testContext,
 				scenarioDefinition: string.Join(Environment.NewLine, scenarioDefinition.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim())),
+				stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
+			);
+		}
+
+		public static void IsInMarkdownDocument(object testContext, string fileName, string scenarioName) {
+			StackTrace stackTrace = new StackTrace();
+			MethodBase? scenarioMethod = stackTrace.GetFrames()
+				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
+				?.GetMethod();
+			if (scenarioMethod == null) {
+				throw new MissingScenarioDefinitionException();
+			}
+			string fileContent = _markdownDocumentDictionary.GetOrAdd(fileName, fileName => {
+				try {
+					return File.ReadAllText(fileName);
+				} catch (FileNotFoundException) {
+					return File.ReadAllText($@"..\..\..\{fileName}");
+				}
+			});
+			string[] lines = fileContent.Split('\n');
+			string[] scenarioLines = lines
+				.SkipWhile(line =>
+					!line.StartsWith($"# {scenarioName}")
+					&& !line.StartsWith($"## {scenarioName}")
+					&& !line.StartsWith($"### {scenarioName}")
+					&& !line.StartsWith($"#### {scenarioName}")
+					&& !line.StartsWith($"##### {scenarioName}")
+					&& !line.StartsWith($"###### {scenarioName}"))
+				.Skip(1)
+				.TakeWhile(line => !string.IsNullOrWhiteSpace(line))
+				.Where(line => !line.StartsWith("```"))
+				.Select(line => {
+					if (line.StartsWith("> ")) return line[2..].Trim();
+					else if (line.StartsWith("- ")) return line[2..].Trim();
+					else if (Regex.IsMatch(line, @"^[0-9]+\. .*$")) return line[line.IndexOf(' ')..].Trim();
+					else return line.Trim();
+				})
+				.ToArray();
+			RunSteps(
+				testContext: testContext,
+				scenarioDefinition: string.Join(Environment.NewLine, scenarioLines),
 				stepDefinitions: GetOrCollectStepDefinitions(scenarioMethod)
 			);
 		}
@@ -130,7 +173,11 @@ namespace Xbehave.Specs {
 					} else if (parameters[i].ParameterType == typeof(decimal)) {
 						parameterValues[i] = decimal.Parse(regexMatches.Groups[i + 1].Value);
 					} else if (parameters[i].ParameterType == typeof(string)) {
-						parameterValues[i] = regexMatches.Groups[i + 1].Value[1..^1];
+						string s = regexMatches.Groups[i + 1].Value;
+						if (s.StartsWith('"') && s.EndsWith('"')) {
+							s = s[1..^1];
+						}
+						parameterValues[i] = s;
 					} else {
 						throw new NotImplementedException($"Step parameter of type {parameters[i].ParameterType.Name} is not supported yet. Supported types are int, double, decimal, and string.");
 					}

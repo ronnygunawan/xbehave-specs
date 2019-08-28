@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>RG.Xbehave.Specs</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <authors>Ronny Gunawan</authors>
     <owners>Ronny Gunawan</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
@@ -10,7 +10,7 @@
     <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
     <projectUrl>https://github.com/ronnygunawan/xbehave-specs</projectUrl>
     <description>An extension to Xbehave that allows you to write gherkin-style unit tests.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>Added support for markdown documents</releaseNotes>
     <copyright>(c) Ronny Gunawan 2019</copyright>
     <tags>cucumber specflow xbehave xunit</tags>
     <repository url="https://github.com/ronnygunawan/xbehave-specs" />
