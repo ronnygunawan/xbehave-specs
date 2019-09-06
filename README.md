@@ -17,6 +17,7 @@ In your .csproj file add:
   <DocumentationFile>.\Documentation.xml</DocumentationFile>
 </PropertyGroup>
 ```
+Note: file name `.\Documentation.xml` could be anything
 
 ## 3. Write Your Scenario
 
