@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace Xbehave.Specs {
 	public static class Spec {
-		private static readonly ConcurrentDictionary<Type, ImmutableList<(string conjunction, string regex, MethodInfo method)>> _stepDefinitionDictionary = new ConcurrentDictionary<Type, ImmutableList<(string conjunction, string regex, MethodInfo method)>>();
-		private static readonly ConcurrentDictionary<string, string> _markdownDocumentDictionary = new ConcurrentDictionary<string, string>();
+		private static readonly ConcurrentDictionary<Type, ImmutableList<(string Conjunction, string Regex, MethodInfo Method)>> STEP_DEFINITION_DICTIONARY = new();
+		private static readonly ConcurrentDictionary<string, string> MARKDOWN_DOCUMENT_DICTIONARY = new();
 		private const string GIVEN = "Given";
 		private const string AND = "And";
 		private const string WHEN = "When";
 		private const string THEN = "Then";
 
 		public static void IsInXmlComments(object testContext) {
-			StackTrace stackTrace = new StackTrace();
+			StackTrace stackTrace = new();
 			MethodBase? scenarioMethod = stackTrace.GetFrames()
 				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
 				?.GetMethod();
@@ -38,14 +38,14 @@ namespace Xbehave.Specs {
 		}
 
 		public static void IsInMarkdownDocument(object testContext, string fileName, string scenarioName) {
-			StackTrace stackTrace = new StackTrace();
+			StackTrace stackTrace = new();
 			MethodBase? scenarioMethod = stackTrace.GetFrames()
 				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
 				?.GetMethod();
 			if (scenarioMethod == null) {
 				throw new MissingScenarioDefinitionException();
 			}
-			string fileContent = _markdownDocumentDictionary.GetOrAdd(fileName, fileName => {
+			string fileContent = MARKDOWN_DOCUMENT_DICTIONARY.GetOrAdd(fileName, fileName => {
 				try {
 					return File.ReadAllText(fileName);
 				} catch (Exception exc) when (exc is FileNotFoundException || exc is DirectoryNotFoundException) {
@@ -79,7 +79,7 @@ namespace Xbehave.Specs {
 		}
 
 		public static void Is(object testContext, string scenarioDefinition) {
-			StackTrace stackTrace = new StackTrace();
+			StackTrace stackTrace = new();
 			MethodBase? scenarioMethod = stackTrace.GetFrames()
 				.FirstOrDefault(frame => frame?.GetMethod()?.GetCustomAttributes(typeof(ScenarioAttribute), false)?.Any() == true)
 				?.GetMethod();
@@ -94,9 +94,9 @@ namespace Xbehave.Specs {
 			);
 		}
 
-		private static ImmutableList<(string conjunction, string regex, MethodInfo method)> GetOrCollectStepDefinitions(MethodBase scenarioMethod) {
-			return _stepDefinitionDictionary.GetOrAdd(scenarioMethod.DeclaringType!, type => {
-				ImmutableList<(string conjunction, string regex, MethodInfo method)>.Builder listBuilder = ImmutableList<(string conjunction, string regex, MethodInfo method)>.Empty.ToBuilder();
+		private static ImmutableList<(string Conjunction, string Regex, MethodInfo Method)> GetOrCollectStepDefinitions(MethodBase scenarioMethod) {
+			return STEP_DEFINITION_DICTIONARY.GetOrAdd(scenarioMethod.DeclaringType!, _ => {
+				ImmutableList<(string Conjunction, string Regex, MethodInfo Method)>.Builder listBuilder = ImmutableList<(string Conjunction, string Regex, MethodInfo Method)>.Empty.ToBuilder();
 				foreach (MethodInfo method in scenarioMethod.DeclaringType!.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly)) {
 					foreach (StepDefinitionBaseAttribute stepDefinition in method.GetCustomAttributes<StepDefinitionBaseAttribute>()) {
 						switch (stepDefinition) {
@@ -116,7 +116,7 @@ namespace Xbehave.Specs {
 			});
 		}
 
-		private static void RunSteps(object testContext, string scenarioDefinition, ImmutableList<(string conjunction, string regex, MethodInfo method)> stepDefinitions) {
+		private static void RunSteps(object testContext, string scenarioDefinition, ImmutableList<(string Conjunction, string Regex, MethodInfo Method)> stepDefinitions) {
 			string[] steps = scenarioDefinition.Split(Environment.NewLine);
 			foreach (string step in steps) {
 				Match? regexMatches = null;
@@ -126,23 +126,23 @@ namespace Xbehave.Specs {
 					switch (conjunction) {
 						case GIVEN:
 							if (step.StartsWith(GIVEN, StringComparison.InvariantCultureIgnoreCase)) {
-								conjugatedStep = step.Substring(GIVEN.Length + 1);
+								conjugatedStep = step[(GIVEN.Length + 1)..];
 							} else if (step.StartsWith(AND, StringComparison.InvariantCultureIgnoreCase)) {
-								conjugatedStep = step.Substring(AND.Length + 1);
+								conjugatedStep = step[(AND.Length + 1)..];
 							} else {
 								continue;
 							}
 							break;
 						case WHEN:
 							if (step.StartsWith(WHEN, StringComparison.InvariantCultureIgnoreCase)) {
-								conjugatedStep = step.Substring(WHEN.Length + 1);
+								conjugatedStep = step[(WHEN.Length + 1)..];
 							} else {
 								continue;
 							}
 							break;
 						case THEN:
 							if (step.StartsWith(THEN, StringComparison.InvariantCultureIgnoreCase)) {
-								conjugatedStep = step.Substring(THEN.Length + 1);
+								conjugatedStep = step[(THEN.Length + 1)..];
 							} else {
 								continue;
 							}

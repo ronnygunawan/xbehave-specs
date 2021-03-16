@@ -27,8 +27,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
-    <PackageReference Include="Xbehave" Version="2.4.0" />
+    <None Remove="nuget.exe" />
+    <None Remove="RG.Xbehave.Specs.1.0.1.nupkg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="Xbehave" Version="2.4.1" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Xbehave.Specs {
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public abstract class StepDefinitionBaseAttribute : Attribute {
 		public string Regex { get; }
 

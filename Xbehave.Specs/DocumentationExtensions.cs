@@ -18,8 +18,8 @@ namespace Xbehave.Specs {
 		/// <returns>The XML fragment describing the method</returns>
 		public static XmlElement? GetDocumentation(this MethodInfo methodInfo) {
 			// Calculate the parameter string as this is in the member name in the XML
-			var parametersString = "";
-			foreach (var parameterInfo in methodInfo.GetParameters()) {
+			string parametersString = "";
+			foreach (ParameterInfo parameterInfo in methodInfo.GetParameters()) {
 				if (parametersString.Length > 0) {
 					parametersString += ",";
 				}
@@ -49,8 +49,8 @@ namespace Xbehave.Specs {
 		/// <param name="memberInfo"></param>
 		/// <returns></returns>
 		public static string GetSummary(this MemberInfo memberInfo) {
-			var element = memberInfo.GetDocumentation();
-			var summaryElm = element?.SelectSingleNode("summary");
+			XmlElement? element = memberInfo.GetDocumentation();
+			XmlNode? summaryElm = element?.SelectSingleNode("summary");
 			if (summaryElm == null) return "";
 			return summaryElm.InnerText.Trim();
 		}
@@ -71,14 +71,14 @@ namespace Xbehave.Specs {
 		/// <param name="type"></param>
 		/// <returns></returns>
 		public static string GetSummary(this Type type) {
-			var element = type.GetDocumentation();
-			var summaryElm = element?.SelectSingleNode("summary");
+			XmlElement? element = type.GetDocumentation();
+			XmlNode? summaryElm = element?.SelectSingleNode("summary");
 			if (summaryElm == null) return "";
 			return summaryElm.InnerText.Trim();
 		}
 
 		/// <summary>
-		/// Obtains the XML Element that describes a reflection element by searching the 
+		/// Obtains the XML Element that describes a reflection element by searching the
 		/// members for a member that has a name that describes the element.
 		/// </summary>
 		/// <param name="type">The type or parent type, used to fetch the assembly</param>
@@ -95,46 +95,43 @@ namespace Xbehave.Specs {
 			else
 				fullName = prefix + ":" + type.FullName + "." + name;
 
-			var xmlDocument = XmlFromAssembly(type.Assembly);
+			XmlDocument? xmlDocument = XmlFromAssembly(type.Assembly);
 
-			var matchedElement = xmlDocument["doc"]["members"].SelectSingleNode("member[@name='" + fullName + "']") as XmlElement;
-
-			return matchedElement;
+			return xmlDocument["doc"]["members"].SelectSingleNode("member[@name='" + fullName + "']") as XmlElement;
 		}
 
 		/// <summary>
 		/// A cache used to remember Xml documentation for assemblies
 		/// </summary>
-		private static readonly Dictionary<Assembly, XmlDocument> Cache = new Dictionary<Assembly, XmlDocument>();
+		private static readonly Dictionary<Assembly, XmlDocument> CACHE = new();
 
 		/// <summary>
 		/// A cache used to store failure exceptions for assembly lookups
 		/// </summary>
-		private static readonly Dictionary<Assembly, Exception> FailCache = new Dictionary<Assembly, Exception>();
+		private static readonly Dictionary<Assembly, Exception> FAIL_CACHE = new();
 
 		/// <summary>
 		/// Obtains the documentation file for the specified assembly
 		/// </summary>
 		/// <param name="assembly">The assembly to find the XML document for</param>
 		/// <returns>The XML document</returns>
-		/// <remarks>This version uses a cache to preserve the assemblies, so that 
+		/// <remarks>This version uses a cache to preserve the assemblies, so that
 		/// the XML file is not loaded and parsed on every single lookup</remarks>
 		public static XmlDocument XmlFromAssembly(this Assembly assembly) {
-			if (FailCache.ContainsKey(assembly)) {
-				throw FailCache[assembly];
+			if (FAIL_CACHE.ContainsKey(assembly)) {
+				throw FAIL_CACHE[assembly];
 			}
 
 			try {
-
-				if (!Cache.ContainsKey(assembly)) {
+				if (!CACHE.ContainsKey(assembly)) {
 					// load the docuemnt into the cache
-					Cache[assembly] = XmlFromAssemblyNonCached(assembly);
+					CACHE[assembly] = XmlFromAssemblyNonCached(assembly);
 				}
 
-				return Cache[assembly];
+				return CACHE[assembly];
 			} catch (Exception exception) {
-				FailCache[assembly] = exception;
-				throw exception;
+				FAIL_CACHE[assembly] = exception;
+				throw;
 			}
 		}
 
@@ -144,22 +141,19 @@ namespace Xbehave.Specs {
 		/// <param name="assembly">The assembly to find the XML document for</param>
 		/// <returns>The XML document</returns>
 		private static XmlDocument XmlFromAssemblyNonCached(Assembly assembly) {
-			var assemblyFilename = assembly.CodeBase!;
+			string assemblyFilename = assembly.CodeBase!;
 
 			const string prefix = "file:///";
 
 			if (assemblyFilename.StartsWith(prefix)) {
-				StreamReader streamReader;
-
 				try {
-					streamReader = new StreamReader(Path.ChangeExtension(assemblyFilename.Substring(prefix.Length), ".xml"));
+					using StreamReader streamReader = new(Path.ChangeExtension(assemblyFilename[prefix.Length..], ".xml"));
+					XmlDocument xmlDocument = new();
+					xmlDocument.Load(streamReader);
+					return xmlDocument;
 				} catch (FileNotFoundException exception) {
 					throw new Exception("XML documentation not present (make sure it is turned on in project properties when building)", exception);
 				}
-
-				var xmlDocument = new XmlDocument();
-				xmlDocument.Load(streamReader);
-				return xmlDocument;
 			} else {
 				throw new Exception("Could not ascertain assembly filename", null);
 			}
